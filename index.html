@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>File Storage Tracker</title>
+
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<header style="display:flex;align-items:center;justify-content:space-between;padding:18px 28px;background:linear-gradient(180deg,rgba(0,0,0,.25),transparent);position:fixed;left:0;right:0;top:0;z-index:50">
+    <div style="font-weight:700;color:#fff;font-size:1.1rem">File Storage Tracker</div>
+    <div style="display:flex;gap:8px;align-items:center">
+        <button id="signin-btn" class="primary" style="padding:8px 12px;border-radius:8px;cursor:pointer">Sign in</button>
+        <button id="change-account-btn" class="secondary" style="padding:8px 12px;border-radius:8px;cursor:pointer;display:none;margin-left:8px">Change Account</button>
+        <button id="signout-header-btn" class="secondary" style="padding:8px 12px;border-radius:8px;cursor:pointer;display:none;margin-left:8px">Sign out</button>
+    </div>
+</header>
+
+
+<section id="hero" class="view-section center-screen active" style="width:100%;background:linear-gradient(180deg,#0f1419,#111);">
+
+
+    <div style="max-width:900px;width:100%;background:transparent;text-align:center;color:#fff;">
+        <h1 style="font-size:clamp(24px,6vw,36px);margin-bottom:12px">Unlimited file tracking.</h1>
+        <p style="color:#cbd5e1;margin-bottom:18px;font-size:clamp(14px,3vw,16px)">Search your files quickly. Sign in to add or manage files.</p>
+        <div style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap">
+            <input id="searchBar" class="search-box" placeholder="Search files..." style="width:clamp(280px,90vw,520px);" />
+        </div>
+        <div id="results" style="margin-top:22px;color:#fff;max-width:900px;max-height:60vh;overflow-y:auto;"></div>
+    </div>
+</section>
+
+
+<div class="sidebar" style="display:none"></div>
+
+
+<div class="main-content" style="display:none">
+    <div class="header-top">
+        <h2>All Files</h2>
+        <input type="text" class="search-box" id="searchBar-main" placeholder="🔍 Search files...">
+    </div>
+    <div id="statusMessage"></div>
+    <div id="results-main"></div>
+</div>
+
+
+<section id="dashboard" class="view-section center-screen" style="background:#12141a;color:#fff;">
+
+
+    <div style="max-width:760px;width:100%;padding:clamp(15px,3vw,20px);">
+        <h2 style="color:#60a5fa;margin-bottom:18px;letter-spacing:1px">ADD NEW FILE</h2>
+        <div id="addForm" class="form-section active">
+            <div id="addStatus"></div>
+
+            <div class="form-group">
+                <label>TITLE</label>
+                <input type="text" id="title" placeholder="...">
+            </div>
+
+            <div class="form-group">
+                <label>STORAGE LOCATION</label>
+                <input type="text" id="storage" placeholder="...">
+            </div>
+
+            <div class="form-group">
+                <label>OTHER INFORMATION</label>
+                <textarea id="info" placeholder="..."></textarea>
+            </div>
+
+            <div class="button-group">
+                <button class="primary" onclick="addFile()">ADD</button>
+                <button class="secondary" onclick="clearForm()">CLEAR</button>
+            </div>
+
+            <div class="button-group" style="margin-top: 15px; flex-direction: column; gap: 8px;">
+                <button class="secondary" onclick="exportFiles()" style="font-size: 12px;">EXPORT FILES</button>
+                <button class="secondary" onclick="importFiles()" style="font-size: 12px;">IMPORT FILES</button>
+            </div>
+        </div>
+    </div>
+</section>
+
+
+
+
+<div id="modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);align-items:center;justify-content:center;z-index:60">
+        <div style="background:#fff;padding:20px;border-radius:8px;min-width:320px">
+                <h3 style="margin-top:0">Sign in</h3>
+                <div style="display:flex;flex-direction:column;gap:8px">
+                        <input id="login-user" placeholder="Username" />
+                        <input id="login-pass" type="password" placeholder="Password" />
+                        <div style="display:flex;gap:8px;justify-content:flex-end">
+                                <button id="cancel-login" class="secondary">Cancel</button>
+                                <button id="submit-login" class="primary">Sign in</button>
+                        </div>
+                        
+                </div>
+        </div>
+</div>
+
+<div id="change-account-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);align-items:center;justify-content:center;z-index:60">
+        <div style="background:#fff;padding:20px;border-radius:8px;min-width:320px">
+                <h3 style="margin-top:0">Change Account</h3>
+                <div style="display:flex;flex-direction:column;gap:8px">
+                        <input id="change-user" placeholder="New Username" />
+                        <input id="change-pass" type="password" placeholder="New Password" />
+                        <input id="change-pass-confirm" type="password" placeholder="Confirm New Password" />
+                        <div style="display:flex;gap:8px;justify-content:flex-end">
+                                <button id="cancel-change" class="secondary">Cancel</button>
+                                <button id="submit-change" class="primary">Update</button>
+                        </div>
+                </div>
+        </div>
+</div>
+
+<div id="password-verify-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);align-items:center;justify-content:center;z-index:60">
+    <div style="background:#fff;padding:20px;border-radius:8px;min-width:320px">
+        <h3 style="margin-top:0" id="verify-modal-title">Verify Password</h3>
+        <div style="display:flex;flex-direction:column;gap:8px">
+            <input id="verify-password" type="password" placeholder="Enter your password" />
+            <div style="display:flex;gap:8px;justify-content:flex-end">
+                <button id="cancel-verify" class="secondary">Cancel</button>
+                <button id="submit-verify" class="primary">Confirm</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+    <script src="script.js"></script>
+
+</body>
+</html>
