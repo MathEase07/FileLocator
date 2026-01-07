@@ -194,7 +194,7 @@
 #results {
     display: flex;
     flex-direction: column;
-    gap: 0;
+    gap: 1;
 }
 
 .year-section {
@@ -477,3 +477,4 @@
 .view-section.active {
     display: flex;      
 }
+
